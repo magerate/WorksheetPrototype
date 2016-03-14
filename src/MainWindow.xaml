@@ -1,0 +1,117 @@
+﻿<Window x:Class="WorksheetPrototype.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="MainWindow" Height="350" Width="525" WindowState="Maximized">
+
+    <Window.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="Themes/Generic.xaml" />
+            </ResourceDictionary.MergedDictionaries>
+        </ResourceDictionary>
+    </Window.Resources>
+
+
+    <DockPanel>
+        <ToolBar DockPanel.Dock="Top">
+            <ToolBarPanel Orientation="Horizontal">
+                <Button Click="Button_Click" Margin="4">Open</Button>
+                <TextBlock Text="Group by: " VerticalAlignment="Center" Margin="4"/>
+                <ComboBox Margin="4" SelectedIndex="0" SelectionChanged="ComboBox_SelectionChanged" Name="groupCombo">
+                    <ComboBoxItem>Material</ComboBoxItem>
+                    <ComboBoxItem>Trade</ComboBoxItem>
+                    <ComboBoxItem>Room</ComboBoxItem>
+                    <ComboBoxItem>Material break by Room</ComboBoxItem>
+                </ComboBox>
+                
+                <Grid Margin="4">
+                    <Button Click="Button_Click_1" Padding="0,0,24,0">Save Column Theme</Button>
+                    <ComboBox Width="18" HorizontalAlignment="Right" Name="columnThemeCombo" SelectionChanged="columnThemeCombo_SelectionChanged"></ComboBox>
+                </Grid>
+            </ToolBarPanel>
+        </ToolBar>
+
+        <ScrollViewer Name="scroller" VerticalScrollBarVisibility="Hidden" HorizontalScrollBarVisibility="Hidden"
+                      DockPanel.Dock="Bottom" >
+            <Grid Name="footerGrid" Background="LightBlue">
+                <Grid.Resources>
+                    <Style TargetType="{x:Type TextBlock}">
+                        <Setter Property="FontWeight" Value="Bold"/>
+                        <Setter Property="VerticalAlignment" Value="Center"/>
+                        <Setter Property="Margin" Value="2"/>
+                    </Style>
+
+                    <Style TargetType="{x:Type Border}">
+                        <Setter Property="HorizontalAlignment" Value="Stretch"/>
+                    </Style>
+                </Grid.Resources>
+
+                <Border Grid.Column="{Binding ElementName=dataGrid1,Path=Columns[0].DisplayIndex}" >
+                    <TextBlock Text="Total"/>
+                </Border>
+
+                <Border Grid.Column="{Binding ElementName=dataGrid1,Path=Columns[4].DisplayIndex}" >
+                    <TextBlock Text="{Binding CostAmount.Value,StringFormat=C}"/>
+                </Border>
+
+                <Border Grid.Column="{Binding ElementName=dataGrid1,Path=Columns[5].DisplayIndex}" >
+                    <TextBlock Text="{Binding SalesAmount.Value,StringFormat=C}"/>
+                </Border>
+
+                <Border Grid.Column="{Binding ElementName=dataGrid1,Path=Columns[6].DisplayIndex}" >
+                    <TextBlock Text="{Binding Profit.Value,StringFormat=C}"/>
+                </Border>
+            </Grid>
+        </ScrollViewer>
+
+
+        <DataGrid Name="dataGrid1" ColumnDisplayIndexChanged="dataGrid1_ColumnDisplayIndexChanged">
+            <DataGrid.GroupStyle>
+                <GroupStyle ContainerStyle="{StaticResource GroupHeaderStyle}" >
+                    <GroupStyle.Panel>
+                        <ItemsPanelTemplate>
+                            <DataGridRowsPresenter/>
+                        </ItemsPanelTemplate>
+                    </GroupStyle.Panel>
+                </GroupStyle>
+            </DataGrid.GroupStyle>
+
+            <DataGrid.Columns>
+                <DataGridTemplateColumn Header="Material" SortMemberPath="Material.Description">
+                    <DataGridTemplateColumn.CellTemplate>
+                        <DataTemplate>
+                            <StackPanel Orientation="Horizontal">
+                                <Rectangle Style="{StaticResource materialRect}"
+                                           Fill="{Binding Path=Material.DisplayColor, Converter={StaticResource colorConverter}}"/>
+                                <TextBlock Text="{Binding Path=Material.Description}" Margin="4,0,0,0"/>
+                            </StackPanel>
+                        </DataTemplate>
+                    </DataGridTemplateColumn.CellTemplate>
+                </DataGridTemplateColumn>
+
+                <DataGridTextColumn Header="Quantity"
+                                    Binding="{Binding UsedQuantity, Converter={StaticResource precisionDoubleConverter}}"/>
+
+                <DataGridTextColumn Header="Cost Price" Binding="{Binding Material.CostPrice, StringFormat=C}"/>
+                <DataGridTextColumn Header="Sales Price" Binding="{Binding Material.SalesPrice, StringFormat=C}"/>
+
+                <DataGridTextColumn Header="Cost Amount" Binding="{Binding CostAmount.Value, StringFormat=C,Mode=OneWay}"/>
+                <DataGridTextColumn Header="Sales Amount" Binding="{Binding SalesAmount.Value, StringFormat=C,Mode=OneWay}"/>
+                <DataGridTextColumn Header="Profit" Binding="{Binding Profit.Value, StringFormat=C,Mode=OneWay}" 
+                                    CellStyle="{StaticResource amountCell}"/>
+
+                <DataGridTextColumn Header="Margin" Binding="{Binding Material.Margin, StringFormat=P}"/>
+                <DataGridTextColumn Header="Markup" Binding="{Binding Material.Markup, StringFormat=P}" Visibility="Hidden"/>
+
+                <DataGridTextColumn Header="Tax Rate" Binding="{Binding Material.TaxRate, StringFormat=P}" Visibility="Hidden"/>
+                <DataGridTextColumn Header="Tax Amount" Binding="{Binding TaxAmount.Value, StringFormat=C, Mode=OneWay}" Visibility="Hidden"/>
+                <DataGridTextColumn Header="Total" Binding="{Binding Total.Value, StringFormat=C, Mode=OneWay}" Visibility="Hidden"/>
+
+                <DataGridTextColumn Header="Layer" Binding="{Binding Layer}" Visibility="Hidden"/>
+                <DataGridTextColumn Header="Room" Binding="{Binding Room}" Visibility="Hidden"/>
+                <DataGridTextColumn Header="Trade" Binding="{Binding Material.Trade}" Visibility="Hidden"/>
+            </DataGrid.Columns>
+        </DataGrid>
+    </DockPanel>
+
+</Window>
